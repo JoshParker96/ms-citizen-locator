@@ -15,6 +15,21 @@ let getAllCitizens = () => {
     })
 }
 
+let getAllCitizensByCity = (city) => {
+    let noCitizensInCityMessage = `Unable to find any citizens in city ${city}`
+    return new Promise(async (resolve, reject) => {
+        try {
+            let allCitizensByCity = await getAllByCity(city)
+            if (!allCitizensByCity.length) {
+                reject(noCitizensInCityMessage)
+            }
+            resolve(allCitizensByCity)
+        } catch (err) {
+            reject(err)
+        }
+    })
+}
+
 let getAllCitizensInAndWithinRadiusOfCity = async (city, radius) => {
     let noCitizensInCityMessage = `Unable to find any citizens in city ${city}`
     return new Promise(async (resolve, reject) => {
@@ -65,5 +80,6 @@ let getCitizensInAndAroundSpecifiedRadius = (citizensInCity, citizensOutsideOfCi
 
 module.exports = {
     getAllCitizens,
+    getAllCitizensByCity,
     getAllCitizensInAndWithinRadiusOfCity
 }
