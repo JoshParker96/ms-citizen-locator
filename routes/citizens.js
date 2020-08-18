@@ -11,6 +11,15 @@ router.get('/citizens', (req, res) => {
         .catch(err => sendUnsuccessfulResponse(res, err, path))
 })
 
+router.get('/citizens/:id', (req, res) => {
+    let citizenId = req.params.id
+    let successMessage = 'successfully found citizen'
+    let path = `/citizens/${citizenId}`
+    return citizenService.getCitizenById(citizenId)
+        .then(citizen => sendSuccessfulResponse(res, successMessage, citizen))
+        .catch(err => sendUnsuccessfulResponse(res, err, path))
+})
+
 router.get('/citizens/:city', (req, res) => {
     let city = req.params.city
     let successMessage = `successfully returned all citizens in city ${city}`
