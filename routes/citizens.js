@@ -16,11 +16,10 @@ router.get('/citizens/:city/:radius', (req, res) => {
     let city = req.params.city
     let radiusInMiles = req.params.radius
     let successMessage = `successfully returned all citizens in and within ${city} with a radius of ${radiusInMiles} miles`
-    let unsuccessfulMessage = 'internal server error'
     let path = `/citizens/${city}/${radiusInMiles}`
-    return citizenService.getAllCitizensWithInRadiusOfCity(city, radiusInMiles)
+    return citizenService.getAllCitizensInAndWithinRadiusOfCity(city, radiusInMiles)
         .then(citizensInRadiusOfCity => sendSuccessfulResponse(res, successMessage, citizensInRadiusOfCity))
-        .catch(err => sendUnsuccessfulResponse(res, unsuccessfulMessage, path))
+        .catch(err => sendUnsuccessfulResponse(res, err, path))
 })
 
 let sendSuccessfulResponse = (res, message, data) => {

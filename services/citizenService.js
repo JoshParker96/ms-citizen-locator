@@ -1,22 +1,28 @@
 const axios = require('axios')
 
+const { constructUrl } = require('../utils/utils')
 const { getAllCitizensWithinRadiusOfLocation } = require('../analyser/coordinateAnalyser')
 const { getAllCitizensUrl, getCitizensByCityUrl, cityCoordinatesUrl } = require('../config/config')
 
 let getAllCitizens = () => {
-    return new Promise((resolve, reject) => {
-        getAll().then((response) => {
-            resolve(response)
-        }).catch((err) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let allCitizens = await getAll()
+            resolve(allCitizens)
+        } catch (err) {
             reject(err)
-        })
+        }
     })
 }
 
-let getAllCitizensWithInRadiusOfCity = async (city, radius) => {
-    return new Promise((resolve, reject) => {
-        getAllByCity(city)
-        .then(async (citizensInCity) => {
+let getAllCitizensInAndWithinRadiusOfCity = async (city, radius) => {
+    let noCitizensInCityMessage = `Unable to find any citizens in city ${city}`
+    return new Promise(async (resolve, reject) => {
+        try {
+            let citizensInCity = await getAllByCity(city)
+            if (!citizensInCity.length) {
+                reject(noCitizensInCityMessage)
+            }
             let allCitizensOutsideOfCity = await getAllCitizensOutsideOfCity(citizensInCity)
             let cityLocation = await getCoordinatesForCity(city)
             let citizensOutsideOfCityWithinRadius = 
@@ -24,7 +30,9 @@ let getAllCitizensWithInRadiusOfCity = async (city, radius) => {
             let citizensInAndAroundSpecifiedRadius =
                 getCitizensInAndAroundSpecifiedRadius(citizensInCity, citizensOutsideOfCityWithinRadius)
             resolve(citizensInAndAroundSpecifiedRadius)
-        })
+        } catch (err) {
+            reject(err)
+        }
     })
 }
 
@@ -34,8 +42,7 @@ let getAll = async () => {
 }
 
 let getAllByCity = async (city) => {
-    let capitalisedCity = city.charAt(0).toUpperCase() + city.slice(1)
-    let url = getCitizensByCityUrl.replace('{city}', capitalisedCity)
+    let url = constructUrl(city, getCitizensByCityUrl, '{city}')
     let response = await axios({method: 'get', url: url})
     return response.data
 }
@@ -47,10 +54,9 @@ let getAllCitizensOutsideOfCity = async (citizensInCity) => {
 }
 
 let getCoordinatesForCity = async (city) => {
-    let capitalisedCity = city.charAt(0).toUpperCase() + city.slice(1)
-    let url = cityCoordinatesUrl.replace('{city}', capitalisedCity)
+    let url = constructUrl(city, cityCoordinatesUrl, '{city}')
     let response = await axios({method: 'get', url: url})
-    return {latitude: response.data.latt, longitude: response.data.longt}
+    return { latitude: response.data.latt, longitude: response.data.longt }
 }
 
 let getCitizensInAndAroundSpecifiedRadius = (citizensInCity, citizensOutsideOfCityWithinRadius) => {
@@ -59,5 +65,5 @@ let getCitizensInAndAroundSpecifiedRadius = (citizensInCity, citizensOutsideOfCi
 
 module.exports = {
     getAllCitizens,
-    getAllCitizensWithInRadiusOfCity
+    getAllCitizensInAndWithinRadiusOfCity
 }
