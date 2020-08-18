@@ -2,7 +2,7 @@ const axios = require('axios')
 
 const { constructUrl } = require('../utils/utils')
 const { getAllCitizensWithinRadiusOfLocation } = require('../analyser/coordinateAnalyser')
-const { getAllCitizensUrl, getCitizensByCityUrl, cityCoordinatesUrl } = require('../config/config')
+const { getAllCitizensUrl, getCitizenByIdUrl, getCitizensByCityUrl, cityCoordinatesUrl } = require('../config/config')
 
 let getAllCitizens = () => {
     return new Promise(async (resolve, reject) => {
@@ -10,6 +10,21 @@ let getAllCitizens = () => {
             let allCitizens = await getAll()
             resolve(allCitizens)
         } catch (err) {
+            reject(err)
+        }
+    })
+}
+
+let getCitizenById = (id) => {
+    let noCitizenFoundMessage = 'no citizen was found'
+    return new Promise(async (resolve, reject) => {
+        try {
+            let citizen = await getById(id)
+            resolve(citizen)
+        } catch (err) {
+            if (citizenIsNotFound(err)) {
+                reject(noCitizenFoundMessage)
+            }
             reject(err)
         }
     })
@@ -56,6 +71,12 @@ let getAll = async () => {
     return response.data
 }
 
+let getById = async (id) => {
+    let prefixUrl = getCitizenByIdUrl
+    let response = await axios({method: 'get', url: prefixUrl + id})
+    return response.data
+}
+
 let getAllByCity = async (city) => {
     let url = constructUrl(city, getCitizensByCityUrl, '{city}')
     let response = await axios({method: 'get', url: url})
@@ -78,8 +99,13 @@ let getCitizensInAndAroundSpecifiedRadius = (citizensInCity, citizensOutsideOfCi
     return citizensInCity.concat(citizensOutsideOfCityWithinRadius)
 }
 
+let citizenIsNotFound = (err) => {
+    return err.response.status == 404
+}
+
 module.exports = {
     getAllCitizens,
+    getCitizenById,
     getAllCitizensByCity,
     getAllCitizensInAndWithinRadiusOfCity
 }
