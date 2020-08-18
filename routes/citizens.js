@@ -5,11 +5,19 @@ const citizenService = require('../services/citizenService')
 
 router.get('/citizens', (req, res) => {
     let successMessage = 'successfully returned all citizens'
-    let unsuccessfulMessage = 'internal server error'
     let path = '/citizens'
     return citizenService.getAllCitizens()
         .then(citizens => sendSuccessfulResponse(res, successMessage, citizens))
-        .catch(err => sendUnsuccessfulResponse(res, unsuccessfulMessage, path))
+        .catch(err => sendUnsuccessfulResponse(res, err, path))
+})
+
+router.get('/citizens/:city', (req, res) => {
+    let city = req.params.city
+    let successMessage = `successfully returned all citizens in city ${city}`
+    let path = `/citizens/${city}`
+    return citizenService.getAllCitizensByCity(city)
+        .then(allCitizensInCity => sendSuccessfulResponse(res, successMessage, allCitizensInCity))
+        .catch(err => sendUnsuccessfulResponse(res, err, path))
 })
 
 router.get('/citizens/:city/:radius', (req, res) => {
