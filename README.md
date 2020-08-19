@@ -26,12 +26,12 @@ and navigate to one of the endpoints listed below
 This application has 4 endpoints
 
 ```
-http://localhost:8080/citizens/<city>/<radius>
+http://localhost:8080/citizens/cities/<city>/radius/<radius>
 ```
 This will return all/any citizens in and within a specified radius of a specified city
 
 ```
-http://localhost:8080/citiznes/<city>
+http://localhost:8080/citiznes/cities/<city>
 ```
 This will return all citizens in a specified city
 

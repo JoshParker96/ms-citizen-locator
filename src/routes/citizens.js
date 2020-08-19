@@ -20,7 +20,7 @@ router.get('/citizens/:id', (req, res) => {
         .catch(err => sendUnsuccessfulResponse(res, err, path))
 })
 
-router.get('/citizens/:city', (req, res) => {
+router.get('/citizens/cities/:city', (req, res) => {
     let city = req.params.city
     let successMessage = `successfully returned all citizens in city ${city}`
     let path = `/citizens/${city}`
@@ -29,7 +29,7 @@ router.get('/citizens/:city', (req, res) => {
         .catch(err => sendUnsuccessfulResponse(res, err, path))
 })
 
-router.get('/citizens/:city/:radius', (req, res) => {
+router.get('/citizens/cities/:city/radius/:radius', (req, res) => {
     let city = req.params.city
     let radiusInMiles = req.params.radius
     let successMessage = `successfully returned all citizens in and within ${city} with a radius of ${radiusInMiles} miles`
