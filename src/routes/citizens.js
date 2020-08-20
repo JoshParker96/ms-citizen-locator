@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 
-const citizenService = require('../services/citizenService')
+const { citizenService } = require('../loaders/dependencyInjector')
 
 router.get('/citizens', (req, res) => {
     let successMessage = 'successfully returned all citizens'

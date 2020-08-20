@@ -1,34 +1,38 @@
 const STATUTE_MILES_PER_NAUTICAL_MILE = 1.15077945;
 
-let getAllCitizensWithinRadiusOfLocation = (citizens, location, radius) => {
-    let locationLatitude  = toRadians(location.latitude);
-    let locationLongitude = toRadians(location.longitude);
-    return filterCitizensWithinRadius(citizens, radius, locationLatitude, locationLongitude);
-}
+class CoordinateAnalyser {
+    constructor() {}
 
-let filterCitizensWithinRadius = (citizens, radius, locationLatitude, locationLongitude) => {
-    let citizensWithinRadius = []
-    for (citizen of citizens) {
-        let citizenLatitude = toRadians(citizen.latitude);
-        let citizenLongitude = toRadians(citizen.longitude);
-        let angle = getAngle(locationLatitude, locationLongitude, citizenLatitude, citizenLongitude);
-        let nauticalMiles = 60 * toDegress(angle)
-        let statuteMiles = STATUTE_MILES_PER_NAUTICAL_MILE * nauticalMiles;
-
-        if (statuteMiles <= radius) {
-            citizensWithinRadius.push(citizen);
-        }
+    getAllCitizensWithinRadiusOfLocation = (citizens, location, radius) => {
+        let locationLatitude  = this.toRadians(location.latitude)
+        let locationLongitude = this.toRadians(location.longitude)
+        return this.filterCitizensWithinRadius(citizens, radius, locationLatitude, locationLongitude)
     }
-    return citizensWithinRadius;
+    
+    filterCitizensWithinRadius = (citizens, radius, locationLatitude, locationLongitude) => {
+        let citizensWithinRadius = []
+        for (let citizen of citizens) {
+            let citizenLatitude = this.toRadians(citizen.latitude)
+            let citizenLongitude = this.toRadians(citizen.longitude)
+            let angle = this.getAngle(locationLatitude, locationLongitude, citizenLatitude, citizenLongitude)
+            let nauticalMiles = 60 * this.toDegress(angle)
+            let statuteMiles = STATUTE_MILES_PER_NAUTICAL_MILE * nauticalMiles
+    
+            if (statuteMiles <= radius) {
+                citizensWithinRadius.push(citizen)
+            }
+        }
+        return citizensWithinRadius
+    }
+    
+    getAngle = (locationLatitude, locationLongitude, citizenLatitude, citizenLongitude) => {
+        return Math.acos(Math.sin(locationLatitude) * Math.sin(citizenLatitude) + 
+                Math.cos(locationLatitude) * Math.cos(citizenLatitude) * Math.cos(locationLongitude - citizenLongitude))
+    }
+    
+    toRadians = degrees => degrees * (Math.PI / 180)
+    
+    toDegress = radians => radians * 180 / Math.PI
 }
 
-let getAngle = (locationLatitude, locationLongitude, citizenLatitude, citizenLongitude) => {
-    return Math.acos(Math.sin(locationLatitude) * Math.sin(citizenLatitude) + 
-            Math.cos(locationLatitude) * Math.cos(citizenLatitude) * Math.cos(locationLongitude - citizenLongitude));
-}
-
-let toRadians = degrees => degrees * (Math.PI / 180);
-
-let toDegress = radians => radians * 180 / Math.PI
-
-module.exports = {getAllCitizensWithinRadiusOfLocation}
+module.exports = { CoordinateAnalyser }
